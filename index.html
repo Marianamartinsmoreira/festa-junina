@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🎉 Festa Junina</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&family=Satisfy&display=swap');
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --red: #C0392B; --red-dark: #922B21;
+    --yellow: #F1C40F; --yellow-light: #FEF9E7;
+    --green: #1E8449; --cream: #FDF6E3;
+    --brown: #6E2C00; --brown-light: #F5ECD7;
+    --text: #2C1810; --muted: #7D6352;
+    --border: rgba(110,44,0,0.15); --radius: 12px;
+  }
+
+  body { font-family: 'Nunito', sans-serif; background: var(--cream); color: var(--text); min-height: 100vh; padding-bottom: 4rem; }
+
+  .bunting-bar { background: var(--brown); height: 36px; display: flex; align-items: flex-start; position: sticky; top: 0; z-index: 100; overflow: hidden; }
+  .bunting-bar::after { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px; background: repeating-linear-gradient(90deg,#F1C40F 0 24px,#C0392B 24px 48px,#1E8449 48px 72px,#F1C40F 72px 96px,#E67E22 96px 120px,#C0392B 120px 144px); }
+  .flag-row { display: flex; align-items: flex-start; position: absolute; top: 3px; left: 0; right: 0; justify-content: space-around; }
+  .flag { width: 0; height: 0; border-left: 10px solid transparent; border-right: 10px solid transparent; border-top: 20px solid; filter: drop-shadow(0 2px 2px rgba(0,0,0,0.25)); }
+  .f1{border-top-color:#F1C40F}.f2{border-top-color:#C0392B}.f3{border-top-color:#1E8449}.f4{border-top-color:#F39C12}.f5{border-top-color:#8E44AD}
+
+  .hero { background: var(--brown); padding: 2.5rem 1rem 2rem; text-align: center; position: relative; overflow: hidden; }
+  .hero::before { content: ''; position: absolute; inset: 0; background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23ffffff' fill-opacity='0.03'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/svg%3E"); }
+  .hero-emoji { font-size: 48px; display: block; margin-bottom: 0.5rem; }
+  .hero-title { font-family: 'Satisfy', cursive; font-size: clamp(2rem,8vw,3.5rem); color: var(--yellow); text-shadow: 3px 3px 0 rgba(0,0,0,0.3); line-height: 1.1; margin-bottom: 0.5rem; }
+  .hero-sub { font-size: 14px; color: rgba(255,255,255,0.7); max-width: 360px; margin: 0 auto; }
+
+  .container { max-width: 640px; margin: 0 auto; padding: 1.5rem 1rem; }
+
+  /* LOADING */
+  #loading-screen { text-align: center; padding: 3rem 1rem; }
+  .spinner { width: 40px; height: 40px; border: 3px solid var(--border); border-top-color: var(--red); border-radius: 50%; animation: spin 0.8s linear infinite; margin: 0 auto 1rem; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* CONFIG SCREEN */
+  #config-screen { display: none; }
+  .config-card { background: white; border: 1px solid var(--border); border-radius: var(--radius); padding: 1.5rem; box-shadow: 0 2px 8px rgba(110,44,0,0.06); }
+  .config-title { font-size: 18px; font-weight: 800; color: var(--brown); margin-bottom: 4px; }
+  .config-sub { font-size: 13px; color: var(--muted); margin-bottom: 1.25rem; line-height: 1.5; }
+  .config-field { margin-bottom: 1rem; }
+  .config-label { font-size: 13px; font-weight: 700; color: var(--brown); display: block; margin-bottom: 4px; }
+  .config-input { width: 100%; padding: 10px 12px; border: 1.5px solid var(--border); border-radius: 8px; font-family: 'Nunito', sans-serif; font-size: 14px; color: var(--text); background: var(--cream); }
+  .config-input:focus { outline: none; border-color: var(--red); box-shadow: 0 0 0 3px rgba(192,57,43,0.1); }
+  .config-hint { font-size: 11px; color: var(--muted); margin-top: 4px; }
+  .config-btn { width: 100%; padding: 13px; background: var(--red); color: white; border: none; border-radius: var(--radius); font-family: 'Nunito', sans-serif; font-size: 15px; font-weight: 700; cursor: pointer; margin-top: 0.5rem; }
+  .config-btn:hover { background: var(--red-dark); }
+  .config-error { font-size: 12px; color: var(--red); margin-top: 6px; display: none; }
+
+  /* BANNER */
+  .availability-banner { background: var(--yellow-light); border: 1.5px solid var(--yellow); border-radius: var(--radius); padding: 10px 14px; font-size: 13px; color: #7D5A00; margin-bottom: 1.25rem; display: flex; align-items: center; gap: 8px; }
+
+  /* REALTIME BADGE */
+  .live-badge { display: inline-flex; align-items: center; gap: 5px; font-size: 11px; font-weight: 700; color: var(--green); background: #D5F5E3; border-radius: 999px; padding: 3px 10px; margin-left: auto; }
+  .live-dot { width: 6px; height: 6px; background: var(--green); border-radius: 50%; animation: pulse 1.5s ease-in-out infinite; }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
+
+  .card { background: white; border: 1px solid var(--border); border-radius: var(--radius); padding: 1.25rem 1.5rem; margin-bottom: 1rem; box-shadow: 0 2px 8px rgba(110,44,0,0.06); }
+  .card-title { font-size: 16px; font-weight: 700; color: var(--brown); margin-bottom: 4px; }
+  .card-hint { font-size: 12px; color: var(--muted); margin-bottom: 1.25rem; }
+
+  .category-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px; color: var(--muted); margin: 1rem 0 8px; padding-bottom: 6px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 6px; }
+  .category-label:first-of-type { margin-top: 0; }
+
+  .items-grid { display: flex; flex-wrap: wrap; gap: 6px; min-height: 0; }
+
+  .prato-btn { display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; border: 1.5px solid var(--border); border-radius: 999px; background: var(--brown-light); color: var(--brown); font-family: 'Nunito', sans-serif; font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.2s; white-space: nowrap; }
+  .prato-btn:hover { border-color: var(--red); background: #FDECEA; color: var(--red-dark); }
+
+  .prato-btn.disappearing { animation: popOut 0.4s cubic-bezier(0.68,-0.55,0.27,1.55) forwards; }
+  @keyframes popOut { 0%{transform:scale(1);opacity:1} 50%{transform:scale(1.15);opacity:0.6} 100%{transform:scale(0);opacity:0;width:0;padding:0;margin:0;border-width:0} }
+
+  .empty-category { font-size: 12px; color: var(--muted); font-style: italic; padding: 4px 0; }
+
+  .selected-card { background: #D5F5E3; border: 1.5px solid #27AE60; border-radius: var(--radius); padding: 1rem 1.25rem; margin-bottom: 1rem; }
+  .selected-title { font-size: 13px; font-weight: 700; color: #145A32; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; }
+  .selected-chips { display: flex; flex-wrap: wrap; gap: 5px; }
+  .chip { display: inline-flex; align-items: center; gap: 4px; background: white; border: 1px solid #27AE60; border-radius: 999px; padding: 3px 10px; font-size: 12px; font-weight: 600; color: #145A32; }
+  .chip-remove { cursor: pointer; font-size: 14px; color: #27AE60; line-height: 1; background: none; border: none; padding: 0; font-family: inherit; }
+  .chip-remove:hover { color: var(--red); }
+
+  .field-label { font-size: 14px; font-weight: 700; color: var(--brown); margin-bottom: 4px; display: block; }
+  .field-hint { font-size: 11px; color: var(--muted); margin-bottom: 8px; }
+  textarea, input[type="text"] { width: 100%; padding: 10px 12px; border: 1.5px solid var(--border); border-radius: 8px; font-family: 'Nunito', sans-serif; font-size: 14px; color: var(--text); background: var(--cream); resize: vertical; transition: border-color 0.15s; }
+  textarea:focus, input[type="text"]:focus { outline: none; border-color: var(--red); box-shadow: 0 0 0 3px rgba(192,57,43,0.1); }
+  textarea { min-height: 80px; }
+
+  .counter-row { display: flex; align-items: center; justify-content: space-between; padding: 8px 0; }
+  .counter-label { font-size: 14px; color: var(--text); }
+  .counter-ctrl { display: flex; align-items: center; gap: 10px; }
+  .cnt-btn { width: 32px; height: 32px; border-radius: 50%; border: 1.5px solid var(--border); background: var(--brown-light); color: var(--brown); font-size: 18px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+  .cnt-btn:hover { background: #EDD9B5; }
+  .cnt-val { font-size: 18px; font-weight: 700; min-width: 28px; text-align: center; color: var(--brown); }
+
+  .submit-btn { width: 100%; padding: 15px; background: var(--red); color: white; border: none; border-radius: var(--radius); font-family: 'Nunito', sans-serif; font-size: 16px; font-weight: 700; cursor: pointer; box-shadow: 0 4px 12px rgba(192,57,43,0.3); transition: background 0.15s; }
+  .submit-btn:hover { background: var(--red-dark); }
+  .clear-link { display: block; text-align: center; margin-top: 12px; font-size: 12px; color: var(--muted); cursor: pointer; text-decoration: underline; }
+  .clear-link:hover { color: var(--red); }
+
+  .field-error { font-size: 12px; color: var(--red); margin-top: 4px; display: none; }
+  .has-error textarea, .has-error input { border-color: var(--red); }
+
+  #success-screen { display: none; text-align: center; padding: 3rem 1.5rem; background: white; border: 1px solid var(--border); border-radius: var(--radius); box-shadow: 0 2px 8px rgba(110,44,0,0.06); }
+  .success-icon { font-size: 56px; margin-bottom: 1rem; }
+  .success-title { font-family: 'Satisfy', cursive; font-size: 2rem; color: var(--brown); margin-bottom: 0.5rem; }
+  .success-body { font-size: 14px; color: var(--muted); line-height: 1.6; }
+
+  /* TOAST */
+  #toast { position: fixed; bottom: 1.5rem; left: 50%; transform: translateX(-50%) translateY(80px); background: #2C1810; color: white; padding: 10px 18px; border-radius: 999px; font-size: 13px; font-weight: 600; opacity: 0; transition: all 0.35s; z-index: 999; white-space: nowrap; }
+  #toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+  @media (max-width: 480px) { .card { padding: 1rem; } .hero-title { font-size: 2.2rem; } }
+</style>
+</head>
+<body>
+
+<div class="bunting-bar">
+  <div class="flag-row" id="flags"></div>
+</div>
+
+<div class="hero">
+  <span class="hero-emoji">🌽</span>
+  <h1 class="hero-title">Festa Junina</h1>
+  <p class="hero-sub">Escolha seus pratos favoritos e confirme sua presença!</p>
+</div>
+
+<div class="container">
+
+  <!-- LOADING -->
+  <div id="loading-screen">
+    <div class="spinner"></div>
+    <p style="color:var(--muted);font-size:14px">Carregando pratos...</p>
+  </div>
+
+  <!-- CONFIG (aparece se não tiver Firebase configurado) -->
+  <div id="config-screen">
+    <div class="config-card">
+      <div class="config-title">⚙️ Configurar Firebase</div>
+      <div class="config-sub">Cole aqui as credenciais do seu projeto Firebase para ativar a sincronização em tempo real. Feito isso, salve o arquivo HTML — não precisará fazer isso de novo.</div>
+
+      <div class="config-field">
+        <label class="config-label">API Key</label>
+        <input class="config-input" id="cfg-apiKey" placeholder="AIzaSy..." />
+      </div>
+      <div class="config-field">
+        <label class="config-label">Auth Domain</label>
+        <input class="config-input" id="cfg-authDomain" placeholder="meu-projeto.firebaseapp.com" />
+      </div>
+      <div class="config-field">
+        <label class="config-label">Database URL</label>
+        <input class="config-input" id="cfg-databaseURL" placeholder="https://meu-projeto-default-rtdb.firebaseio.com" />
+      </div>
+      <div class="config-field">
+        <label class="config-label">Project ID</label>
+        <input class="config-input" id="cfg-projectId" placeholder="meu-projeto" />
+      </div>
+      <div class="config-error" id="cfg-error">Preencha todos os campos.</div>
+      <button class="config-btn" id="cfg-save">Salvar e continuar →</button>
+      <p class="config-hint" style="margin-top:10px;text-align:center">Não sabe como? Veja o tutorial abaixo do formulário.</p>
+    </div>
+
+    <div style="background:white;border:1px solid var(--border);border-radius:var(--radius);padding:1.25rem 1.5rem;margin-top:1rem;box-shadow:0 2px 8px rgba(110,44,0,0.06)">
+      <p style="font-size:14px;font-weight:700;color:var(--brown);margin-bottom:0.75rem">📋 Como criar o Firebase (5 minutos)</p>
+      <ol style="font-size:13px;color:var(--muted);line-height:2;padding-left:1.25rem">
+        <li>Acesse <a href="https://console.firebase.google.com" target="_blank" style="color:var(--red)">console.firebase.google.com</a></li>
+        <li>Clique em <strong>Adicionar projeto</strong> → dê um nome → clique em <strong>Criar projeto</strong></li>
+        <li>No menu lateral, clique em <strong>Realtime Database</strong> → <strong>Criar banco de dados</strong></li>
+        <li>Escolha a região → em "Regras de segurança" selecione <strong>Modo de teste</strong> → Ativar</li>
+        <li>Clique na engrenagem ⚙️ → <strong>Configurações do projeto</strong> → role até "Seus aplicativos"</li>
+        <li>Clique em <strong>&lt;/&gt;</strong> (Web) → registre o app → copie as credenciais e cole acima</li>
+      </ol>
+    </div>
+  </div>
+
+  <!-- FORM PRINCIPAL -->
+  <div id="form-body" style="display:none">
+
+    <div class="availability-banner">
+      🍽️ <span><strong id="avail-count">—</strong> pratos disponíveis</span>
+      <span class="live-badge"><span class="live-dot"></span>Ao vivo</span>
+    </div>
+
+    <div class="selected-card" id="selected-card" style="display:none">
+      <div class="selected-title">
+        <span>✅ Seus pratos (<span id="sel-count">0</span>)</span>
+      </div>
+      <div class="selected-chips" id="selected-chips"></div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Escolha seu prato</div>
+      <div class="card-hint">Cada prato pode ser escolhido por apenas uma pessoa — quem escolher primeiro garante! 🏃</div>
+
+      <div class="category-label">🍲 Salgados e caldos</div>
+      <div class="items-grid" id="grid-salgados"></div>
+
+      <div class="category-label">🌽 Milho e cereais</div>
+      <div class="items-grid" id="grid-milho"></div>
+
+      <div class="category-label">🍰 Doces e sobremesas</div>
+      <div class="items-grid" id="grid-doces"></div>
+
+      <div class="category-label">🍢 Petiscos e lanches</div>
+      <div class="items-grid" id="grid-petiscos"></div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Quem vai?</div>
+      <label class="field-label" for="nomes">Seu nome e de quem vai com você</label>
+      <div class="field-hint">Separe por vírgula. Ex: João, Maria, Ana</div>
+      <div id="nomes-field">
+        <textarea id="nomes" placeholder="Digite os nomes aqui..."></textarea>
+        <div class="field-error" id="nomes-error">Por favor, informe pelo menos seu nome.</div>
+      </div>
+      <div style="margin-top:1rem">
+        <label class="field-label">Quantas pessoas no total?</label>
+        <div class="counter-row">
+          <span class="counter-label">Número de convidados</span>
+          <div class="counter-ctrl">
+            <button class="cnt-btn" id="dec">−</button>
+            <span class="cnt-val" id="pessoas-val">1</span>
+            <button class="cnt-btn" id="inc">+</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <button class="submit-btn" id="submit-btn">Confirmar presença 🎊</button>
+    <span class="clear-link" id="clear-link">Limpar minha seleção</span>
+  </div>
+
+  <div id="success-screen">
+    <div class="success-icon">🎊</div>
+    <h2 class="success-title" style="font-family:'Satisfy',cursive">Presença confirmada!</h2>
+    <p class="success-body" id="success-msg"></p>
+    <span class="clear-link" style="display:inline-block;margin-top:1rem" id="restart-link">Responder novamente</span>
+  </div>
+
+</div>
+
+<div id="toast"></div>
+
+<!-- Firebase SDKs -->
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
+
+<script>
+// ─── COLE SUAS CREDENCIAIS FIREBASE AQUI ──────────────────────────────────
+// (ou preencha pelo formulário de configuração que aparece na tela)
+const FIREBASE_CONFIG = {
+  apiKey: "AIzaSyAAcpVXpIdbFFIckcBlxIPakWEf1GlxWgE",
+  authDomain: "festa-junina-345db.firebaseapp.com",
+  databaseURL: "https://festa-junina-345db-default-rtdb.firebaseio.com",
+  projectId: "festa-junina-345db"
+};
+// ──────────────────────────────────────────────────────────────────────────
+
+const PRATOS = {
+  'grid-salgados': ['Mocotó','Caldo de mandioca','Caldo de feijão','Torresmo','Canjiquinha','Vaca atolada','Cachorro quente','Salgados'],
+  'grid-milho':    ['Milho verde','Mingau de milho verde','Canjica doce','Bolo de milho'],
+  'grid-doces':    ['Cocada','Brigadeiro e Cajuzinho','Pé de moleque','Pé de moleque com chocolate','Bolo de cenoura com chocolate','Pipoca'],
+  'grid-petiscos': ['Coxinha','Pastel','Mini Espetinho']
+};
+const TOTAL = Object.values(PRATOS).flat().length;
+
+// bandeirinhas
+const flagRow = document.getElementById('flags');
+['f1','f2','f3','f4','f5'].forEach((c,i) => {
+  for (let j=0;j<6;j++) { const d=document.createElement('div'); d.className='flag '+['f1','f2','f3','f4','f5'][(i+j)%5]; flagRow.appendChild(d); }
+});
+
+// renderizar botões
+const btnMap = {}; // prato -> button element
+Object.entries(PRATOS).forEach(([gridId, items]) => {
+  const grid = document.getElementById(gridId);
+  items.forEach(nome => {
+    const btn = document.createElement('button');
+    btn.className = 'prato-btn';
+    btn.textContent = nome;
+    btn.onclick = () => trySelect(nome);
+    grid.appendChild(btn);
+    btnMap[nome] = { btn, gridId };
+  });
+});
+
+// estado local
+const mySelected = new Set();
+let pessoas = 1;
+let db, pratosTakenRef;
+
+// ── TOAST ─────────────────────────────────────────────────────────────────
+let toastTimer;
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 2800);
+}
+
+// ── FIREBASE INIT ─────────────────────────────────────────────────────────
+function initFirebase(config) {
+  try {
+    if (!firebase.apps.length) firebase.initializeApp(config);
+    db = firebase.database();
+    pratosTakenRef = db.ref('pratos_escolhidos');
+
+    // escuta em tempo real
+    let firstLoad = true;
+    pratosTakenRef.on('value', snap => {
+      const taken = snap.val() || {};
+      updateUI(taken);
+      if (firstLoad) {
+        firstLoad = false;
+        document.getElementById('loading-screen').style.display = 'none';
+        document.getElementById('form-body').style.display = 'block';
+      }
+    });
+    return true;
+  } catch(e) {
+    console.error(e);
+    return false;
+  }
+}
+
+// ── ATUALIZAR UI com base no Firebase ─────────────────────────────────────
+function updateUI(taken) {
+  let available = 0;
+  Object.entries(btnMap).forEach(([nome, {btn, gridId}]) => {
+    const isTaken = taken[sanitize(nome)] !== undefined;
+    const isMine  = mySelected.has(nome);
+
+    if (isTaken && !isMine) {
+      // sumiu — escolhido por outra pessoa
+      hidePrato(nome, false);
+    } else if (!isTaken) {
+      // voltou (alguém desfez) — mas só mostra se não é meu
+      if (!isMine) showPrato(nome);
+      available++;
+    } else {
+      // é meu — mantém escondido
+    }
+  });
+
+  // conta disponíveis (não tomados por ninguém)
+  const takenCount = Object.keys(taken).length;
+  document.getElementById('avail-count').textContent = TOTAL - takenCount;
+}
+
+function sanitize(nome) { return nome.replace(/[.#$/[\]]/g, '_'); }
+
+// ── SELECIONAR PRATO ──────────────────────────────────────────────────────
+function trySelect(nome) {
+  if (mySelected.has(nome)) return;
+  const key = sanitize(nome);
+
+  // tenta gravar (se já existir, o listener vai detectar e não deixar)
+  pratosTakenRef.child(key).transaction(current => {
+    if (current !== null) return; // já tomado — aborta
+    return { por: document.getElementById('nomes').value.trim() || 'Alguém', em: Date.now() };
+  }, (err, committed) => {
+    if (err) { showToast('Erro de conexão. Tente novamente.'); return; }
+    if (!committed) { showToast(`"${nome}" acabou de ser escolhido por outra pessoa! 😅`); hidePrato(nome, false); return; }
+    // sucesso
+    mySelected.add(nome);
+    hidePrato(nome, true);
+    updateSelectedPanel();
+  });
+}
+
+// ── REMOVER PRATO (desfazer) ──────────────────────────────────────────────
+function removeMyPrato(nome) {
+  const key = sanitize(nome);
+  pratosTakenRef.child(key).remove();
+  mySelected.delete(nome);
+  updateSelectedPanel();
+}
+
+// ── ESCONDER / MOSTRAR BOTÃO ──────────────────────────────────────────────
+function hidePrato(nome, animate) {
+  const {btn, gridId} = btnMap[nome];
+  if (btn.style.display === 'none') return;
+  if (animate) {
+    btn.classList.add('disappearing');
+    setTimeout(() => { btn.style.display = 'none'; btn.classList.remove('disappearing'); checkEmpty(gridId); }, 400);
+  } else {
+    btn.style.display = 'none';
+    checkEmpty(gridId);
+  }
+}
+
+function showPrato(nome) {
+  const {btn, gridId} = btnMap[nome];
+  if (btn.style.display !== 'none') return;
+  btn.style.display = '';
+  btn.style.opacity = '0';
+  btn.style.transform = 'scale(0.8)';
+  requestAnimationFrame(() => {
+    btn.style.transition = 'opacity 0.3s,transform 0.3s';
+    btn.style.opacity = '1';
+    btn.style.transform = 'scale(1)';
+  });
+  setTimeout(() => { btn.style.transition = ''; }, 350);
+  checkEmpty(gridId);
+}
+
+function checkEmpty(gridId) {
+  const grid = document.getElementById(gridId);
+  const visible = [...grid.querySelectorAll('.prato-btn')].filter(b => b.style.display !== 'none');
+  const ex = grid.querySelector('.empty-category');
+  if (visible.length === 0 && !ex) {
+    const el = document.createElement('p'); el.className = 'empty-category';
+    el.textContent = 'Todos os pratos desta categoria foram escolhidos!';
+    grid.appendChild(el);
+  } else if (visible.length > 0 && ex) { ex.remove(); }
+}
+
+// ── PAINEL DE SELECIONADOS ────────────────────────────────────────────────
+function updateSelectedPanel() {
+  const card = document.getElementById('selected-card');
+  const chips = document.getElementById('selected-chips');
+  document.getElementById('sel-count').textContent = mySelected.size;
+  if (mySelected.size === 0) { card.style.display = 'none'; return; }
+  card.style.display = 'block';
+  chips.innerHTML = '';
+  mySelected.forEach(nome => {
+    const chip = document.createElement('span');
+    chip.className = 'chip';
+    chip.innerHTML = `${nome} <button class="chip-remove" aria-label="Remover ${nome}">×</button>`;
+    chip.querySelector('.chip-remove').onclick = () => removeMyPrato(nome);
+    chips.appendChild(chip);
+  });
+}
+
+// ── PESSOAS ───────────────────────────────────────────────────────────────
+document.getElementById('dec').onclick = () => { if(pessoas>1){pessoas--;document.getElementById('pessoas-val').textContent=pessoas;} };
+document.getElementById('inc').onclick = () => { if(pessoas<30){pessoas++;document.getElementById('pessoas-val').textContent=pessoas;} };
+
+// ── SUBMIT ────────────────────────────────────────────────────────────────
+document.getElementById('submit-btn').onclick = () => {
+  const nomes = document.getElementById('nomes').value.trim();
+  const nomesField = document.getElementById('nomes-field');
+  const nomesError = document.getElementById('nomes-error');
+  nomesField.classList.remove('has-error'); nomesError.style.display = 'none';
+  if (!nomes) { nomesField.classList.add('has-error'); nomesError.style.display = 'block'; document.getElementById('nomes').focus(); return; }
+  if (mySelected.size === 0) { showToast('Selecione pelo menos um prato!'); return; }
+
+  // atualiza "por" com o nome real
+  mySelected.forEach(nome => {
+    pratosTakenRef.child(sanitize(nome)).update({ por: nomes });
+  });
+
+  document.getElementById('form-body').style.display = 'none';
+  document.getElementById('success-screen').style.display = 'block';
+  const primeiroNome = nomes.split(',')[0].trim().split(' ')[0];
+  document.getElementById('success-msg').innerHTML =
+    `Obrigado, <strong>${primeiroNome}</strong>! 🎉<br><br>
+    Você escolheu <strong>${mySelected.size} prato${mySelected.size>1?'s':''}</strong> para <strong>${pessoas} pessoa${pessoas>1?'s':''}</strong>.<br><br>
+    <em>${[...mySelected].join(', ')}</em><br><br>
+    Nos vemos na festa! 🌽🎊`;
+};
+
+// ── LIMPAR ────────────────────────────────────────────────────────────────
+function resetForm() {
+  mySelected.forEach(nome => pratosTakenRef.child(sanitize(nome)).remove());
+  mySelected.clear();
+  document.getElementById('nomes').value = '';
+  document.getElementById('nomes-field').classList.remove('has-error');
+  document.getElementById('nomes-error').style.display = 'none';
+  pessoas = 1; document.getElementById('pessoas-val').textContent = '1';
+  updateSelectedPanel();
+  document.getElementById('form-body').style.display = 'block';
+  document.getElementById('success-screen').style.display = 'none';
+}
+document.getElementById('clear-link').onclick = resetForm;
+document.getElementById('restart-link').onclick = resetForm;
+
+// ── CONFIGURAÇÃO FIREBASE (tela de setup) ─────────────────────────────────
+function isConfigured(cfg) {
+  return cfg.apiKey && cfg.authDomain && cfg.databaseURL && cfg.projectId;
+}
+
+function tryInit() {
+  let cfg = { ...FIREBASE_CONFIG };
+
+  // tenta config salva no localStorage
+  try {
+    const saved = localStorage.getItem('fj_firebase_cfg');
+    if (saved) cfg = { ...cfg, ...JSON.parse(saved) };
+  } catch(e) {}
+
+  if (isConfigured(cfg)) {
+    const ok = initFirebase(cfg);
+    if (ok) return;
+  }
+
+  // mostra tela de configuração
+  document.getElementById('loading-screen').style.display = 'none';
+  document.getElementById('config-screen').style.display = 'block';
+}
+
+document.getElementById('cfg-save').onclick = () => {
+  const cfg = {
+    apiKey:      document.getElementById('cfg-apiKey').value.trim(),
+    authDomain:  document.getElementById('cfg-authDomain').value.trim(),
+    databaseURL: document.getElementById('cfg-databaseURL').value.trim(),
+    projectId:   document.getElementById('cfg-projectId').value.trim()
+  };
+  const err = document.getElementById('cfg-error');
+  if (!isConfigured(cfg)) { err.style.display = 'block'; return; }
+  err.style.display = 'none';
+  try { localStorage.setItem('fj_firebase_cfg', JSON.stringify(cfg)); } catch(e) {}
+  document.getElementById('config-screen').style.display = 'none';
+  document.getElementById('loading-screen').style.display = 'block';
+  initFirebase(cfg);
+};
+
+tryInit();
+</script>
+</body>
+</html>
